@@ -142,12 +142,12 @@ public class Maze {
         setData(entry, 1);
 
         /* Fill each reachable MazeCoord in maze and put min distance into it */
-        tryPath(entry);
+        try2(entry, 0);
 
         /* Check if exit is visited hence assure if there is a path or not */
         if (getData(exit) != Integer.MAX_VALUE - 1) {
             traceBackPath(exit);
-            printData();
+//            printData();
             path = new LinkedList<>(pathOutput(pathStack));
             return true;
         }
@@ -198,7 +198,7 @@ public class Maze {
     private MazeCoord findMinNext(MazeCoord coord) {
         int min = getData(coord);
         MazeCoord next = coord;
-        for (int i = 1; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             if (checkCoord(move(coord, i), visitTimes) > -1 && getData(move(coord, i)) < min) {
                 min = getData(move(coord, i));
                 next = move(coord, i);
@@ -213,67 +213,44 @@ public class Maze {
      * @param coord input MazeCoord
      */
     private void greedy(MazeCoord coord) {
-        for (int i = 1; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             if (checkCoord(move(coord, i), visitTimes) > -1) {
                 setMin(coord, move(coord, i));
             }
         }
     }
 
-    /**
-     * Fill mazeData recursively with min distance from entry to exit.
-     *
-     * @param current current MazeCoord
-     */
-    private void tryPath(MazeCoord current) {
-        greedy(current);
+    private void try2(MazeCoord cur, int ori) {
+        greedy(cur);
         MazeCoord next;
-        for (int i = 1; i < 5; i++) {
-            if (checkCoord(move(current, i), visitTimes) > -1) {
-                setMin(move(current, i), current);
+        for (int i = 0; i < 4; i++) {
+            if (3 - ori != i && checkCoord(move(cur, i), visitTimes) > 0) {
+                next = move(cur, i);
+                addVisit(next);
+                try2(next, i);
             }
         }
-        if (checkCoord(move(current, 1), visitTimes) > 0) {
-            next = move(current, 1);
+        if (checkCoord(move(cur, 3 - ori), visitTimes) > 0) {
+            next = move(cur, 3 - ori);
             addVisit(next);
-            setMin(current, next);
-            System.out.println("Current: " + current.toString() + " " + getData(current) + " Next: " + next.toString() + " " + getData(next));
-            tryPath(next);
-        }
-        if (checkCoord(move(current, 2), visitTimes) > 0) {
-            next = move(current, 2);
-            addVisit(next);
-            setMin(current, next);
-            System.out.println("Current: " + current.toString() + " " + getData(current) + " Next: " + next.toString() + " " + getData(next));
-            tryPath(next);
-        }
-        if (checkCoord(move(current, 3), visitTimes) > 0) {
-            next = move(current, 3);
-            addVisit(next);
-            setMin(current, next);
-            System.out.println("Current: " + current.toString() + " " + getData(current) + " Next: " + next.toString() + " " + getData(next));
-            tryPath(next);
-        }
-        if (checkCoord(move(current, 4), visitTimes) > 0) {
-            next = move(current, 4);
-            addVisit(next);
-            setMin(current, next);
-            System.out.println("Current: " + current.toString() + " " + getData(current) + " Next: " + next.toString() + " " + getData(next));
-            tryPath(next);
+            try2(next, 3 - ori);
         }
     }
 
     /**
      * Set min distance in two continues coord.
      *
-     * @param cur  coord 1
-     * @param next coord 2
+     * @param coord1 coord 1
+     * @param coord2 coord 2
      */
-    private void setMin(MazeCoord cur, MazeCoord next) {
-        int curData = getData(cur);
-        int nextData = getData(next);
+    private void setMin(MazeCoord coord1, MazeCoord coord2) {
+        int curData = getData(coord1);
+        int nextData = getData(coord2);
         if (curData + 1 < nextData) {
-            setData(next, curData + 1);
+            setData(coord2, curData + 1);
+        }
+        if (nextData + 1 < curData) {
+            setData(coord1, nextData + 1);
         }
     }
 
@@ -296,28 +273,29 @@ public class Maze {
 
     /**
      * Move to input MazeCoord to selected direction.
+     * Sum of opposite direction (i.e, up and down) is 3.
      *
-     * @param coord       input MazeCoord
-     * @param orientation 1 - move upward
-     *                    2 - move downward
-     *                    3 - move left
-     *                    4 - move right
+     * @param coord  input MazeCoord
+     * @param orient 0 - move upward
+     *               1 - move left
+     *               2 - move right
+     *               3 - move down
      * @return MazeCoord that after movement
      */
-    private MazeCoord move(MazeCoord coord, int orientation) {
+    private MazeCoord move(MazeCoord coord, int orient) {
         int newCol = coord.getCol();
         int newRow = coord.getRow();
 
-        if (orientation == 1) {
+        if (orient == 0) {
             return new MazeCoord(newRow - 1, newCol);
-        } else if (orientation == 2) {
-            return new MazeCoord(newRow + 1, newCol);
-        } else if (orientation == 3) {
+        } else if (orient == 1) {
             return new MazeCoord(newRow, newCol - 1);
-        } else if (orientation == 4) {
+        } else if (orient == 2) {
             return new MazeCoord(newRow, newCol + 1);
+        } else if (orient == 3) {
+            return new MazeCoord(newRow + 1, newCol);
         } else {
-            System.out.println("Orientation Error!");
+            System.out.println("Wrong Orientation! " + orient);
             return coord;
         }
     }
