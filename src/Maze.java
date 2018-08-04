@@ -3,15 +3,17 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 /**
+ * Maze class.
+ * This class defines the method to obtain the info of total rows & columns.
+ * Also in this class search shortest method is defined (searchPath).
+ * The searchPath method will be called by MazeFrame. If searchPath returns true, then path will be found and draw.
+ *
  * @author BorisMirage
  * Time: 2018/07/26 20:49
  * Created with IntelliJ IDEA
  */
 
 public class Maze {
-
-    public static final boolean FREE = false;
-    public static final boolean WALL = true;
 
     private MazeCoord entry;
     private MazeCoord exit;
@@ -21,7 +23,7 @@ public class Maze {
     private Stack<MazeCoord> pathStack = new Stack<>();
 
     /**
-     * Necessary data that to construct a maze.
+     * Necessary info that to construct a maze.
      *
      * @param mazeData 2D int array that store the info of maze (wall, space, distance).
      * @param startLoc MazeCoord start location
@@ -53,7 +55,7 @@ public class Maze {
     }
 
     /**
-     * Check if input location has wall.
+     * Check if input MazeCoord has wall.
      *
      * @param loc input location
      * @return true if input location has wall, otherwise return false.
@@ -64,6 +66,7 @@ public class Maze {
 
     /**
      * Get entry MazeCoord.
+     * Used in MazeComponent.
      *
      * @return entry MazeCoord
      */
@@ -73,6 +76,7 @@ public class Maze {
 
     /**
      * Get exit MazeCoord.
+     * Used in MazeComponent.
      *
      * @return exit MazeCoord
      */
@@ -82,6 +86,7 @@ public class Maze {
 
     /**
      * Get path from entry to exit.
+     * Used in MazeComponent.
      *
      * @return path from entry to exit
      */
@@ -96,7 +101,7 @@ public class Maze {
      *
      * @return true if there exist a path from entry to exit, otherwise false
      */
-    public boolean search() {
+    public boolean searchPath() {
 
         if (hasWallAt(entry) || hasWallAt(exit)) {
             return false;
@@ -118,8 +123,6 @@ public class Maze {
 
         /* Check if exit is visited hence assure if there is a path or not */
         if (getData(exit) != Integer.MAX_VALUE - 1) {
-//            sortMap();
-//            printData();
             traceBackPath(exit);
             path = new LinkedList<>(pathOutput(pathStack));
             return true;
@@ -161,23 +164,6 @@ public class Maze {
                     addVisit(next);
                     tryNext(next, i);
                 }
-            }
-        }
-
-
-//        /* Finally try incoming direction */
-//        if (checkCoord(moveNext(cur, 3 - ori), visitTimes) > 0) {
-//            next = moveNext(cur, 3 - ori);
-//            addVisit(next);
-//            tryNext(next, 3 - ori);
-//        }
-    }
-
-    private void sortMap() {
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[0].length; j++) {
-                if (data[i][j] != -1 && data[i][j] != Integer.MAX_VALUE - 1)
-                    greedy(new MazeCoord(i, j));
             }
         }
     }

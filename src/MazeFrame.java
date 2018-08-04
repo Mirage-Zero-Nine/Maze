@@ -5,7 +5,7 @@ import java.awt.event.KeyEvent;
 
 /**
  * Maze frame class.
- * This class determine the shape of maze and path line that displayed.
+ * This class determine the shape of maze, message and path line to be displayed.
  *
  * @author BorisMirage
  * Time: 2018/07/26 20:52
@@ -54,10 +54,9 @@ public class MazeFrame extends JFrame {
 
 
     /**
-     * getSearchMessage returns the message to display for a successful
-     * or failed search.
+     * getSearchMessage returns the message to display for a successful or fail.
      *
-     * @param success whether the search succeeded
+     * @param success whether the searchPath succeeded
      * @return the string to display
      */
     public String getSearchMessage(boolean success) {
@@ -76,12 +75,11 @@ public class MazeFrame extends JFrame {
         int count = 0;
 
         /**
-         * keyPressed is called when the user types a character.
-         * The action taken is to do the maze search, then update the display according to the results of the search.
+         * keyPressed is called when the user type a key.
+         * The action taken is to do the maze searchPath, and update the display depends on the result of searchPath.
          *
          * @param event What the user typed. Ignored here.
          */
-
         public void keyPressed(KeyEvent event) {
             if (count == 0) {
                 count = 1;
@@ -90,7 +88,7 @@ public class MazeFrame extends JFrame {
                 System.out.println("DEBUG: key pressed");
                 System.out.println("DEBUG: doing maze search. . . ");
 
-                boolean success = maze.search();
+                boolean success = maze.searchPath();
 
                 /* Update drawing to show the results */
                 mazeComponent.repaint();
