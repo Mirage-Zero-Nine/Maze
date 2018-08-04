@@ -1,8 +1,7 @@
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 /**
  * Maze frame class.
@@ -30,7 +29,8 @@ public class MazeFrame extends JFrame {
     private static final String FAIL_STRING = "No path can be found from entry to exit.";
 
     /**
-     * Sets up the GUI components with the given maze data.
+     * Sets up GUI components with the given maze data.
+     * Meanwhile, it will add a key adapter.
      *
      * @param mazeData store maze data
      * @param entryLoc the entry location of the maze
@@ -69,6 +69,9 @@ public class MazeFrame extends JFrame {
     }
 
 
+    /**
+     * Listening to input key action.
+     */
     class MazeKeyListener extends KeyAdapter { // inner class -- has access to outer object's instance variables
         int count = 0;
 
@@ -82,12 +85,15 @@ public class MazeFrame extends JFrame {
         public void keyPressed(KeyEvent event) {
             if (count == 0) {
                 count = 1;
+
+                /* Terminal Output */
                 System.out.println("DEBUG: key pressed");
-
                 System.out.println("DEBUG: doing maze search. . . ");
-                boolean success = maze.search();     // maze defined in enclosing MazeFrame
 
-                mazeComponent.repaint();  // update drawing to show the results
+                boolean success = maze.search();
+
+                /* Update drawing to show the results */
+                mazeComponent.repaint();
 
                 System.out.println("DEBUG: " + getSearchMessage(success));
                 searchStatusLabel.setText(getSearchMessage(success));

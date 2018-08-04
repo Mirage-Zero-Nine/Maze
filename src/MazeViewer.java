@@ -1,5 +1,6 @@
-import java.io.*;
 import javax.swing.*;
+import java.io.*;
+import java.util.LinkedList;
 
 /**
  * Main function of Maze
@@ -22,28 +23,34 @@ public class MazeViewer {
      */
     public static void main(String[] args) {
 
-        String fileName = "";
-
+        String fileDirectory = "./src/testfiles";
+        File testFile = new File(fileDirectory);
+        LinkedList<String> filePath = new LinkedList<>();
+        String[] nameList = testFile.list();
+        if (nameList != null) {
+            for (String aNameList : nameList) {
+                String temp = fileDirectory + "/" + aNameList;
+                filePath.add(temp);
+            }
+        }
         try {
-
-            if (args.length < 1) {
-                System.out.println("ERROR: missing file name command line argument");
-            } else {
-                fileName = args[0];
-                JFrame frame = readMazeFile(fileName);
+            while (filePath.size() != 0) {
+                JFrame frame = readMazeFile(filePath.pop());
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.setVisible(true);
             }
-
         } catch (FileNotFoundException exc) {
-            System.out.println("ERROR: File not found: " + fileName);
+            System.out.println("ERROR: File not found: " + fileDirectory);
         } catch (IOException exc) {
             exc.printStackTrace();
         }
+        System.out.println(filePath);
+
     }
 
     /**
-     * Read maze file and convert it to Maze data
+     * Read maze file and convert it to Maze data.
+     * This method will read data in maze file and create a new MazeFrame object for display and Maze path searching.
      *
      * @param fileName maze file path
      * @return new MazeFrame for later usage
