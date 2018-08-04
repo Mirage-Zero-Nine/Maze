@@ -24,7 +24,7 @@ public class MazeTester {
      */
     public static void main(String[] args) {
 
-        String fileDirectory = "./src/testfiles";
+        String fileDirectory = "./src/TestMaze";
         File testFile = new File(fileDirectory);
         LinkedList<String> filePath = new LinkedList<>();
         String[] nameList = testFile.list();
