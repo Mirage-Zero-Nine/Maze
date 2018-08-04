@@ -142,12 +142,12 @@ public class Maze {
         setData(entry, 1);
 
         /* Fill each reachable MazeCoord in maze and put min distance into it */
-        try2(entry, 0);
+        tryNext(entry, 0);
 
         /* Check if exit is visited hence assure if there is a path or not */
         if (getData(exit) != Integer.MAX_VALUE - 1) {
             traceBackPath(exit);
-//            printData();
+            printData();
             path = new LinkedList<>(pathOutput(pathStack));
             return true;
         }
@@ -199,9 +199,9 @@ public class Maze {
         int min = getData(coord);
         MazeCoord next = coord;
         for (int i = 0; i < 4; i++) {
-            if (checkCoord(move(coord, i), visitTimes) > -1 && getData(move(coord, i)) < min) {
-                min = getData(move(coord, i));
-                next = move(coord, i);
+            if (checkCoord(moveNext(coord, i), visitTimes) > -1 && getData(moveNext(coord, i)) < min) {
+                min = getData(moveNext(coord, i));
+                next = moveNext(coord, i);
             }
         }
         return next;
@@ -214,31 +214,50 @@ public class Maze {
      */
     private void greedy(MazeCoord coord) {
         for (int i = 0; i < 4; i++) {
-            if (checkCoord(move(coord, i), visitTimes) > -1) {
-                setMin(coord, move(coord, i));
+            if (checkCoord(moveNext(coord, i), visitTimes) > -1) {
+                setMin(coord, moveNext(coord, i));
             }
         }
     }
 
-    private void try2(MazeCoord cur, int ori) {
+    /**
+     * Try possible next coord recursively until each coord has been visited 4 times.
+     * This recursion contains orientation in order to avoid duplicate movement.
+     * It will try move direction that is not same as input orientation.
+     * If all 3 different direction is not available, it will finally try last incoming direction.
+     *
+     * @param cur current MazeCoord
+     * @param ori orientation from previous movement.
+     *            i.e, if current MazeCoord came from previous MazeCoord move upward, then the input orientation is 0.
+     *            See moveNext for more orientation int info
+     */
+    private void tryNext(MazeCoord cur, int ori) {
+
+        /* First compare distance in current MazeCoord */
         greedy(cur);
+
         MazeCoord next;
         for (int i = 0; i < 4; i++) {
-            if (3 - ori != i && checkCoord(move(cur, i), visitTimes) > 0) {
-                next = move(cur, i);
+
+            /* Avoid try incoming direction and check availability */
+            if (3 - ori != i && checkCoord(moveNext(cur, i), visitTimes) > 0) {
+                next = moveNext(cur, i);
                 addVisit(next);
-                try2(next, i);
+                tryNext(next, i);
             }
         }
-        if (checkCoord(move(cur, 3 - ori), visitTimes) > 0) {
-            next = move(cur, 3 - ori);
+
+        /* Finally try incoming direction */
+        if (checkCoord(moveNext(cur, 3 - ori), visitTimes) > 0) {
+            next = moveNext(cur, 3 - ori);
             addVisit(next);
-            try2(next, 3 - ori);
+            tryNext(next, 3 - ori);
         }
     }
 
     /**
      * Set min distance in two continues coord.
+     * coord1 and coord2
      *
      * @param coord1 coord 1
      * @param coord2 coord 2
@@ -282,7 +301,7 @@ public class Maze {
      *               3 - move down
      * @return MazeCoord that after movement
      */
-    private MazeCoord move(MazeCoord coord, int orient) {
+    private MazeCoord moveNext(MazeCoord coord, int orient) {
         int newCol = coord.getCol();
         int newRow = coord.getRow();
 
@@ -301,7 +320,7 @@ public class Maze {
     }
 
     /**
-     * Print distance data for debug purpose.
+     * Print distance data as debug purpose.
      */
     private void printData() {
         for (int[] aData : data) {
