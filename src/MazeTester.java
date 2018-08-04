@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * Test function
@@ -23,18 +24,26 @@ public class MazeTester {
      */
     public static void main(String[] args) {
 
-//        String fileName = "/Users/borismirage/IdeaProjects/Maze/src/testfiles/upperLeftMaze";
-//        String fileName = "/Users/borismirage/IdeaProjects/Maze/src/testfiles/bigMaze";
-//        String fileName = "/Users/borismirage/IdeaProjects/Maze/src/testfiles/noWallsBig";
-        String fileName = "/Users/borismirage/IdeaProjects/Maze/src/testfiles/mazeCycle";
-
+        String fileDirectory = "./src/testfiles";
+        File testFile = new File(fileDirectory);
+        LinkedList<String> filePath = new LinkedList<>();
+        String[] nameList = testFile.list();
+        if (nameList != null) {
+            for (String aNameList : nameList) {
+                String temp = fileDirectory + "/" + aNameList;
+                filePath.add(temp);
+            }
+        }
         try {
-            readMazeFile(fileName);
+            while (filePath.size() != 0) {
+                readMazeFile(filePath.pop());
+            }
         } catch (FileNotFoundException exc) {
-            System.out.println("ERROR: File not found: " + fileName);
+            System.out.println("ERROR: File not found: " + fileDirectory);
         } catch (IOException exc) {
             exc.printStackTrace();
         }
+        System.out.println(filePath);
     }
 
     /**
