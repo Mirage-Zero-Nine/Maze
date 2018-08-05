@@ -4,6 +4,9 @@ import java.awt.geom.Line2D;
 import java.util.ListIterator;
 
 /**
+ * MazeComponent class
+ * A component that displays the maze and path through it if one has been found.
+ *
  * @author BorisMirage
  * Time: 2018/07/26 20:50
  * Created with IntelliJ IDEA
@@ -11,11 +14,6 @@ import java.util.ListIterator;
 
 
 public class MazeComponent extends JComponent {
-    /**
-     * MazeComponent class
-     * <p>
-     * A component that displays the maze and path through it if one has been found.
-     */
 
     private static final int START_X = 10;      // top left of corner of maze in frame
     private static final int START_Y = 10;
