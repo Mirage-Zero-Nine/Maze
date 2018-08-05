@@ -33,6 +33,8 @@ public class MazeViewer {
                 filePath.add(temp);
             }
         }
+
+        /* Generate maze */
         try {
             while (filePath.size() != 0) {
                 JFrame frame = readMazeFile(filePath.pop());
@@ -66,15 +68,12 @@ public class MazeViewer {
         BufferedReader newBufferRead = new BufferedReader(newReader);
 
         /* Read first line about new maze, convert to integer. */
-        String firstLine = newBufferRead.readLine();
-        String[] para = firstLine.split(" ");
-        int mazeRow = Integer.parseInt(para[0]);
-        int mazeColumn = Integer.parseInt(para[1]);
+        String[] para = newBufferRead.readLine().split(" ");
 
-        int[][] readMazeData = new int[mazeRow][mazeColumn];
+        int[][] readMazeData = new int[Integer.parseInt(para[0])][Integer.parseInt(para[1])];
 
         /* Read following lines. */
-        for (int i = 0; i < mazeRow; i++) {
+        for (int i = 0; i < Integer.parseInt(para[0]); i++) {
             String line = newBufferRead.readLine();
             for (int j = 0; j < line.length(); j++) {
                 char current = line.charAt(j);
@@ -90,15 +89,11 @@ public class MazeViewer {
         }
 
         /* Read last two lines to obtain elements: entry and exit. */
-        String startLine = newBufferRead.readLine();
-        String exitLine = newBufferRead.readLine();
+        String[] startLine = newBufferRead.readLine().split(" ");
+        String[] endLine = newBufferRead.readLine().split(" ");
 
-        int startRow = Integer.parseInt(startLine.split(" ")[0]);
-        int startColumn = Integer.parseInt(startLine.split(" ")[1]);
-        int exitRow = Integer.parseInt(exitLine.split(" ")[0]);
-        int exitColumn = Integer.parseInt(exitLine.split(" ")[1]);
-        MazeCoord newMazeStart = new MazeCoord(startRow, startColumn);
-        MazeCoord newMazeExit = new MazeCoord(exitRow, exitColumn);
+        MazeCoord newMazeStart = new MazeCoord(Integer.parseInt(startLine[0]), Integer.parseInt(startLine[1]));
+        MazeCoord newMazeExit = new MazeCoord(Integer.parseInt(endLine[0]), Integer.parseInt(endLine[1]));
 
         return new MazeFrame(readMazeData, newMazeStart, newMazeExit);
     }
