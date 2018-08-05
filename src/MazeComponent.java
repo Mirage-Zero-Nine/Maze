@@ -54,7 +54,7 @@ public class MazeComponent extends JComponent {
         /* Draw maze wall */
         drawMaze(g2);
 
-        /* Draw entry location */
+        /* Draw entry */
         int entryX = START_X + entryCol * BOX_WIDTH + INSET;
         int entryY = START_Y + entryRow * BOX_HEIGHT + INSET;
         Rectangle entryLocation = new Rectangle(entryX, entryY, BOX_WIDTH - 2 * INSET, BOX_WIDTH - 2 * INSET);
@@ -62,7 +62,7 @@ public class MazeComponent extends JComponent {
         g2.draw(entryLocation);
         g2.fill(entryLocation);
 
-        /* Draw the exit location */
+        /* Draw exit */
         int exitX = START_X + exitCol * BOX_WIDTH + INSET;
         int exitY = START_Y + exitRow * BOX_HEIGHT + INSET;
         Rectangle exitLocation = new Rectangle(exitX, exitY, BOX_WIDTH - 2 * INSET, BOX_HEIGHT - 2 * INSET);
@@ -70,7 +70,7 @@ public class MazeComponent extends JComponent {
         g2.draw(exitLocation);
         g2.fill(exitLocation);
 
-        /* Draw the path*/
+        /* Draw path*/
         if (maze.getPath().size() != 0) {
             drawPath(g2);
         }
