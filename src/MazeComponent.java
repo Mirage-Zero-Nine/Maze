@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.util.ListIterator;
+import java.util.LinkedList;
 
 /**
  * MazeComponent class
@@ -29,7 +29,6 @@ public class MazeComponent extends JComponent {
      * @param maze the maze to display
      */
     public MazeComponent(Maze maze) {
-
         this.maze = maze;
     }
 
@@ -40,27 +39,22 @@ public class MazeComponent extends JComponent {
      * @param g the graphics context
      */
     public void paintComponent(Graphics g) {
+        int entryRow = maze.getEntryLoc().getRow();
+        int entryCol = maze.getEntryLoc().getCol();
+        int exitRow = maze.getExitLoc().getRow();
+        int exitCol = maze.getExitLoc().getCol();
 
-        /* Get entry and exit coord */
-        MazeCoord entry = maze.getEntryLoc();
-        MazeCoord exit = maze.getExitLoc();
-        int entryRow = entry.getRow();
-        int entryCol = entry.getCol();
-        int exitRow = exit.getRow();
-        int exitCol = exit.getCol();
-
-        /* Recover Graphics2D */
         Graphics2D g2 = (Graphics2D) g;
 
-        /* Draw the border */
+        /* Draw border */
         Rectangle border = new Rectangle(START_X, START_Y, maze.numCols() * BOX_WIDTH, maze.numRows() * BOX_HEIGHT);
         g2.setColor(Color.BLACK);
         g2.draw(border);
 
-        /* Draw the maze */
+        /* Draw maze wall */
         drawMaze(g2);
 
-        /* Draw the entry location */
+        /* Draw entry location */
         int entryX = START_X + entryCol * BOX_WIDTH + INSET;
         int entryY = START_Y + entryRow * BOX_HEIGHT + INSET;
         Rectangle entryLocation = new Rectangle(entryX, entryY, BOX_WIDTH - 2 * INSET, BOX_WIDTH - 2 * INSET);
@@ -86,7 +80,7 @@ public class MazeComponent extends JComponent {
     }
 
     /**
-     * Draw maze wall
+     * Draw maze wall in black rectangle.
      *
      * @param g2 2-D graphics context
      */
@@ -95,44 +89,40 @@ public class MazeComponent extends JComponent {
             for (int j = 0; j < maze.numCols(); j++) {
                 int currentX = START_Y + j * BOX_WIDTH;
                 int currentY = START_X + i * BOX_HEIGHT;
-                MazeCoord temp = new MazeCoord(i, j);
-                if (maze.hasWallAt(temp)) {
-                    Rectangle Wall = new Rectangle(currentX, currentY, BOX_WIDTH, BOX_HEIGHT);
-                    g2.setColor(Color.BLACK);
-                    g2.draw(Wall);
-                    g2.fill(Wall);
+                if (maze.hasWallAt(new MazeCoord(i, j))) {
+                    Rectangle mazeWall = new Rectangle(currentX, currentY, BOX_WIDTH, BOX_HEIGHT);
+                    g2.setColor(Color.DARK_GRAY);
+                    g2.draw(mazeWall);
+                    g2.fill(mazeWall);
                 }
             }
         }
     }
 
     /**
-     * Draw path to exit (if exist)
+     * Draw path from to exit if path is existing.
+     * Each "path" component is a rectangle so that can be seen more directly.
      *
      * @param g2 2-D graphics context
      */
     private void drawPath(Graphics2D g2) {
 
-        ListIterator<MazeCoord> iter = maze.getPath().listIterator();
+        /* Copy path */
+        LinkedList<MazeCoord> finalPath = new LinkedList<>(maze.getPath());
 
-        MazeCoord location1 = iter.next();
+        /* Avoid entry and exit to be replaced */
+        for (int i = 1; i < finalPath.size() - 1; i++) {
+            MazeCoord cur = finalPath.get(i);
+            int x1 = START_X + cur.getCol() * BOX_WIDTH;
+            int y1 = START_Y + cur.getRow() * BOX_HEIGHT;
+            Rectangle segment = new Rectangle(x1, y1, BOX_WIDTH, BOX_HEIGHT);
 
-        while (iter.hasNext()) {
+            /* Set path fill color */
+            Color pathColor = new Color(83, 142, 217);
 
-            /* Get next location */
-            MazeCoord location2 = iter.next();
-
-            /* Set coord */
-            int x1 = START_X + location1.getCol() * BOX_WIDTH + BOX_WIDTH / 2;
-            int y1 = START_Y + location1.getRow() * BOX_HEIGHT + BOX_HEIGHT / 2;
-            int nextX = START_X + location2.getCol() * BOX_WIDTH + BOX_WIDTH / 2;
-            int nextY = START_Y + location2.getRow() * BOX_HEIGHT + BOX_HEIGHT / 2;
-
-            /* Draw line */
-            Line2D.Double segment = new Line2D.Double(x1, y1, nextX, nextY);
-            g2.setColor(Color.RED);
+            g2.setColor(pathColor);
             g2.draw(segment);
-            location1 = location2;
+            g2.fill(segment);
         }
     }
 
@@ -145,11 +135,10 @@ public class MazeComponent extends JComponent {
 
         /* Draw parallel lines */
         for (int i = 0; i < maze.numRows(); i++) {
-            int x1 = START_X;
             int y1 = START_Y + i * BOX_HEIGHT;
             int x2 = START_X + maze.numCols() * BOX_WIDTH;
             int y2 = START_Y + i * BOX_HEIGHT;
-            Line2D.Double segment = new Line2D.Double(x1, y1, x2, y2);
+            Line2D.Double segment = new Line2D.Double(START_X, y1, x2, y2);
             g2.setColor(Color.GRAY);
             g2.draw(segment);
 
@@ -158,10 +147,9 @@ public class MazeComponent extends JComponent {
         /* Draw vertical lines */
         for (int j = 0; j < maze.numCols(); j++) {
             int x1 = START_X + j * BOX_WIDTH;
-            int y1 = START_Y;
             int x2 = START_X + j * BOX_HEIGHT;
             int y2 = START_Y + maze.numRows() * BOX_HEIGHT;
-            Line2D.Double segment = new Line2D.Double(x1, y1, x2, y2);
+            Line2D.Double segment = new Line2D.Double(x1, START_Y, x2, y2);
             g2.setColor(Color.GRAY);
             g2.draw(segment);
         }
