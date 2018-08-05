@@ -1,7 +1,7 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.util.ListIterator;
-import javax.swing.JComponent;
 
 /**
  * @author BorisMirage
@@ -82,6 +82,9 @@ public class MazeComponent extends JComponent {
         if (maze.getPath().size() != 0) {
             drawPath(g2);
         }
+
+        /* Draw grid */
+        drawGrid(g2);
     }
 
     /**
@@ -129,9 +132,35 @@ public class MazeComponent extends JComponent {
 
             /* Draw line */
             Line2D.Double segment = new Line2D.Double(x1, y1, nextX, nextY);
-            g2.setColor(Color.BLUE);
+            g2.setColor(Color.RED);
             g2.draw(segment);
             location1 = location2;
+        }
+    }
+
+    private void drawGrid(Graphics2D g2) {
+
+        /* Draw parallel lines */
+        for (int i = 0; i < maze.numRows(); i++) {
+            int x1 = START_X;
+            int y1 = START_Y + i * BOX_HEIGHT;
+            int x2 = START_X + maze.numCols() * BOX_WIDTH;
+            int y2 = START_Y + i * BOX_HEIGHT;
+            Line2D.Double segment = new Line2D.Double(x1, y1, x2, y2);
+            g2.setColor(Color.GRAY);
+            g2.draw(segment);
+
+        }
+
+        /* Draw vertical lines */
+        for (int j = 0; j < maze.numCols(); j++) {
+            int x1 = START_X + j * BOX_WIDTH;
+            int y1 = START_Y;
+            int x2 = START_X + j * BOX_HEIGHT;
+            int y2 = START_Y + maze.numRows() * BOX_HEIGHT;
+            Line2D.Double segment = new Line2D.Double(x1, y1, x2, y2);
+            g2.setColor(Color.GRAY);
+            g2.draw(segment);
         }
     }
 }
