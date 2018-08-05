@@ -138,6 +138,11 @@ public class MazeComponent extends JComponent {
         }
     }
 
+    /**
+     * Draw maze grid.
+     *
+     * @param g2 input Graphics2D
+     */
     private void drawGrid(Graphics2D g2) {
 
         /* Draw parallel lines */
