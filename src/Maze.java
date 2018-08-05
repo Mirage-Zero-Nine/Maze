@@ -91,7 +91,8 @@ public class Maze {
      * @return path from entry to exit
      */
     public LinkedList<MazeCoord> getPath() {
-        return path;
+
+        return new LinkedList<>(path);
     }
 
     /**
