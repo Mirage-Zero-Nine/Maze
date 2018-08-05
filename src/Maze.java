@@ -2,6 +2,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Stack;
 
+
 /**
  * Maze class.
  * This class defines the method to obtain the info of total rows & columns.
@@ -12,7 +13,6 @@ import java.util.Stack;
  * Time: 2018/07/26 20:49
  * Created with IntelliJ IDEA
  */
-
 public class Maze {
 
     private MazeCoord entry;

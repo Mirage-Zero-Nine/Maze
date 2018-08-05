@@ -11,8 +11,6 @@ import java.awt.event.KeyEvent;
  * Time: 2018/07/26 20:52
  * Created with IntelliJ IDEA
  */
-
-
 public class MazeFrame extends JFrame {
 
     private JLabel searchStatusLabel;
@@ -52,7 +50,6 @@ public class MazeFrame extends JFrame {
         setFocusable(true);
     }
 
-
     /**
      * getSearchMessage returns the message to display for a successful or fail.
      *
@@ -66,7 +63,6 @@ public class MazeFrame extends JFrame {
             return FAIL_STRING;
         }
     }
-
 
     /**
      * Listening to input key action.
