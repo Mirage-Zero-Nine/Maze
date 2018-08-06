@@ -1,8 +1,9 @@
 # Maze
 
-This is a maze demo that has GUI to display itself with the shortest route from entry to exit.
-Meanwhile, some test maze is contained in the `src` folder.
-No need to add those files as argument, directly set MazeViewer as main class and execute it.
+A maze path finding that recursively find a path from entry to exit.
+
+This maze demo can draw maze to display it with the shortest route from entry to exit.
+Meanwhile, some test maze is contained in the `src` folder. Set MazeViewer as main class and execute it will graw maze and the path on display.
 
 Some sample path output (these test file can be found in src/TestMaze): 
 
