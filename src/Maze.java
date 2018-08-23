@@ -8,8 +8,7 @@ import java.util.Stack;
  * This class defines the method to obtain the info of total rows & columns.
  * Also in this class search shortest method is defined (searchPath).
  * The searchPath method will be called by MazeFrame. If searchPath returns true, then path will be found and draw.
- *
- * @author BorisMirage
+ * * @author BorisMirage
  * Time: 2018/07/26 20:49
  * Created with IntelliJ IDEA
  */
@@ -146,10 +145,13 @@ public class Maze {
         /* First compare distance in current MazeCoord */
         greedy(cur);
 
+//        if (visitTimes[exit.getRow()][exit.getRow()] > 3) {
+//            return;
+//        }
         MazeCoord next;
         if (ori == -1) {
             for (int i = 0; i < 4; i++) {
-                if (checkCoord(moveNext(cur, i), visitTimes) > 0) {
+                if (checkCoord(moveNext(cur, i)) > 0) {
                     next = moveNext(cur, i);
                     addVisit(next);
                     tryNext(next, i);
@@ -159,7 +161,7 @@ public class Maze {
             for (int i = 0; i < 4; i++) {
 
                 /* Avoid try incoming direction and check availability */
-                if (3 - ori != i && checkCoord(moveNext(cur, i), visitTimes) > 0) {
+                if (3 - ori != i && checkCoord(moveNext(cur, i)) > 0) {
                     next = moveNext(cur, i);
                     addVisit(next);
                     tryNext(next, i);
@@ -213,7 +215,7 @@ public class Maze {
         int min = getData(coord);
         MazeCoord next = coord;
         for (int i = 0; i < 4; i++) {
-            if (checkCoord(moveNext(coord, i), visitTimes) > -1 && getData(moveNext(coord, i)) < min) {
+            if (checkCoord(moveNext(coord, i)) > -1 && getData(moveNext(coord, i)) < min) {
                 min = getData(moveNext(coord, i));
                 next = moveNext(coord, i);
             }
@@ -228,7 +230,7 @@ public class Maze {
      */
     private void greedy(MazeCoord coord) {
         for (int i = 0; i < 4; i++) {
-            if (checkCoord(moveNext(coord, i), visitTimes) > -1) {
+            if (checkCoord(moveNext(coord, i)) > -1) {
                 setMin(coord, moveNext(coord, i));
             }
         }
@@ -255,17 +257,16 @@ public class Maze {
     /**
      * Check if input position can be moved to.
      *
-     * @param c           input coord
-     * @param visitRecord 2D int array record visit times
-     * @return -1 if out of bound or has wall, 0 if visited more than 4 times, or 1 if available.
+     * @param c input coord
+     * @return -1 if out of bound or has wall, 0 if visited more than 3 times, or 1 if available.
      */
-    private int checkCoord(MazeCoord c, int[][] visitRecord) {
+    private int checkCoord(MazeCoord c) {
         if (c.getRow() > numRows() - 1 || c.getRow() < 0 || c.getCol() > numCols() - 1 || c.getCol() < 0 || hasWallAt(c)) {
-            return -1;
-        } else if (visitRecord[c.getRow()][c.getCol()] > 3) {
-            return 0;
+            return -1;      // Out of bound
+        } else if (visitTimes[c.getRow()][c.getCol()] > 4) {
+            return 0;       // Duplicate visit
         } else {
-            return 1;
+            return 1;       // Available
         }
     }
 
