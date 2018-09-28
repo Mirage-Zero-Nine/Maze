@@ -19,7 +19,7 @@ public class Maze {
 
     private MazeCoord entry;
     private MazeCoord exit;
-    private int[][] data;       // int array that store walls and distance
+    private int[][] distance;       // int array that store walls and distance
     private boolean[][] close;      // true if this point is "closed", and false if this point is "open"
     private LinkedList<MazeCoord> path = new LinkedList<>();
     private Stack<MazeCoord> pathStack = new Stack<>();
@@ -34,8 +34,8 @@ public class Maze {
     public Maze(int[][] mazeData, MazeCoord startLoc, MazeCoord exitLoc) {
         entry = startLoc;
         exit = exitLoc;
-        data = mazeData;
-        close = new boolean[data.length][data[0].length];
+        distance = mazeData;
+        close = new boolean[distance.length][distance[0].length];
     }
 
     /**
@@ -44,7 +44,7 @@ public class Maze {
      * @return number of rows in maze
      */
     public int numRows() {
-        return data.length;
+        return distance.length;
     }
 
     /**
@@ -53,7 +53,7 @@ public class Maze {
      * @return number of columns in maze.
      */
     public int numCols() {
-        return data[0].length;
+        return distance[0].length;
     }
 
     /**
@@ -63,7 +63,7 @@ public class Maze {
      * @return true if input location has wall, otherwise return false.
      */
     public boolean hasWall(MazeCoord loc) {
-        return data[loc.getRow()][loc.getCol()] == -1;
+        return distance[loc.getRow()][loc.getCol()] == -1;
     }
 
     /**
@@ -103,7 +103,7 @@ public class Maze {
      * @return represented value store in 2D int array mazeData
      */
     private int getData(MazeCoord coord) {
-        return data[coord.getRow()][coord.getCol()];
+        return distance[coord.getRow()][coord.getCol()];
     }
 
     /**
@@ -113,7 +113,7 @@ public class Maze {
      * @param value value to be set
      */
     private void setData(MazeCoord coord, int value) {
-        data[coord.getRow()][coord.getCol()] = value;
+        distance[coord.getRow()][coord.getCol()] = value;
     }
 
     /**
@@ -161,7 +161,7 @@ public class Maze {
         close[c.getRow()][c.getCol()] = true;
         MazeCoord next;
         for (int i = 0; i < 4; i++) {
-            next = moveNext(c, i);
+            next = moveCoord(c, i);
             if (isAvailable(next) > -1 && (getData(next) == 0 || getData(next) > getData(c) + 1)) {
                 setData(next, getData(c) + 1);
                 close[next.getRow()][next.getCol()] = false;        // Open this point
@@ -194,7 +194,7 @@ public class Maze {
     }
 
     /**
-     * Generate shortest path depending on the data that set in findShortestPath.
+     * Generate shortest path depending on the distance that set in findShortestPath.
      * Use a stack to store path from exit to entry.
      * If trace from entry to exit, then different path will be found, hence increases complexity.
      * After this trace process is done (reach entry), pop stack content into <code>LinkedList path</code>.
@@ -211,7 +211,7 @@ public class Maze {
         while (!coord.equals(entry)) {
             int min = getData(coord);
             for (int i = 0; i < 4; i++) {
-                move = moveNext(coord, i);
+                move = moveCoord(coord, i);
                 if (isAvailable(move) > -1 && getData(move) < min) {
                     min = getData(move);
                     temp = move;
@@ -239,7 +239,7 @@ public class Maze {
      *               3 - move down
      * @return MazeCoord that after movement
      */
-    private MazeCoord moveNext(MazeCoord coord, int orient) throws InvalidParameterException {
+    private MazeCoord moveCoord(MazeCoord coord, int orient) throws InvalidParameterException {
         int r = coord.getRow();
         int c = coord.getCol();
 
@@ -259,11 +259,11 @@ public class Maze {
     }
 
     /**
-     * Print distance data for debug purpose.
+     * Print distance for debug purpose.
      */
-    public void printData() {
-        for (int[] aData : data) {
-            System.out.println(Arrays.toString(aData));
+    void printData() {
+        for (int[] dist : distance) {
+            System.out.println(Arrays.toString(dist));
         }
     }
 }
