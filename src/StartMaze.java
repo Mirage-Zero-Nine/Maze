@@ -50,7 +50,7 @@ public class StartMaze {
         } catch (IOException exc) {
             exc.printStackTrace();
         }
-        System.out.println(filePath);
+//        System.out.println(filePath);
 
     }
 

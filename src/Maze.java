@@ -261,7 +261,7 @@ public class Maze {
     /**
      * Print distance data for debug purpose.
      */
-    private void printData() {
+    public void printData() {
         for (int[] aData : data) {
             System.out.println(Arrays.toString(aData));
         }
