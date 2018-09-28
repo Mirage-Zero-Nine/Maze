@@ -47,7 +47,7 @@ public class MazeTester {
     }
 
     /**
-     * Same as readMazeFile class in MazeViewer.
+     * Same as readMazeFile class in StartMaze.
      *
      * @param fileName maze file path
      * @throws IOException file does not found exception
