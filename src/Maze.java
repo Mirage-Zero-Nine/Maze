@@ -1,3 +1,4 @@
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -5,8 +6,10 @@ import java.util.Stack;
 
 /**
  * Maze class that defines the method to obtain the info of total rows & columns.
- * Also in this class search shortest method is defined (searchPath).
- * The searchPath method will be called by MazeFrame. If searchPath returns true, then path will be found and draw.
+ * In <code>StartMaze</code> class, it will read all maze file in <code>TestMaze</code> folder and create new mazes.
+ * Each <code>Maze</code> structure contains entry & exit location, with all walls.
+ * In this class, search path method is provided as <code>searchPath</code>, if path is found then it will return true.
+ * If path is found, call <code>getPath</code> method will obtain the path and in <code>MazeFrame</code> will draw it.
  *
  * @author BorisMirage
  * Time: 2018/07/26 20:49
@@ -17,7 +20,7 @@ public class Maze {
     private MazeCoord entry;
     private MazeCoord exit;
     private int[][] data;       // int array that store walls and distance
-    private int[][] close;      // whether this point will be revisited in further recursion
+    private boolean[][] close;      // true if this point is "closed", and false if this point is "open"
     private LinkedList<MazeCoord> path = new LinkedList<>();
     private Stack<MazeCoord> pathStack = new Stack<>();
 
@@ -32,7 +35,7 @@ public class Maze {
         entry = startLoc;
         exit = exitLoc;
         data = mazeData;
-        close = new int[data.length][data[0].length];
+        close = new boolean[data.length][data[0].length];
     }
 
     /**
@@ -142,17 +145,26 @@ public class Maze {
 
     /**
      * Find shortest path in maze using Dijkstra algorithm.
+     * In this approach one 2D boolean array <code>close</code> is included.
+     * This array store the status of each MazeCoord can be searched in future or not.
+     * If current MazeCoord's corresponding position in array is marked as "true", then this coord will not be visited.
+     * During the search process, mark current MazeCoord as "close", then update all four directions' min distance.
+     * If any previous MazeCoord that is marked as "close" updated its distance, remark it as "open".
+     * Since if one MazeCoord has update its min distance, then it may update its related MazeCoord.
+     * Finally, if all MazeCoord has been marked as their min distance from entry to exit, then end this search process.
      *
      * @param c current coord
      */
     private void findShortestPath(MazeCoord c) {
-        close[c.getRow()][c.getCol()] = 1;
+
+        /* Mark this point to close */
+        close[c.getRow()][c.getCol()] = true;
         MazeCoord next;
         for (int i = 0; i < 4; i++) {
             next = moveNext(c, i);
             if (isAvailable(next) > -1 && (getData(next) == 0 || getData(next) > getData(c) + 1)) {
                 setData(next, getData(c) + 1);
-                close[next.getRow()][next.getCol()] = 0;        // Open this point
+                close[next.getRow()][next.getCol()] = false;        // Open this point
             }
             if (isAvailable(next) > 0) {
                 findShortestPath(next);
@@ -162,6 +174,9 @@ public class Maze {
 
     /**
      * Check given MazeCoord is available to be moved or not.
+     * If given MazeCoord is out of bound or wall existing, then return -1. (Unreachable)
+     * If given MazeCoord is "close" in respective <code>close</code> array, then return 0. (Don't search)
+     * Otherwise, return true.
      *
      * @param c MazeCoord
      * @return if this coord can be moved to or not
@@ -172,7 +187,7 @@ public class Maze {
         if (c.getRow() > numRows() - 1 || c.getRow() < 0 || c.getCol() > numCols() - 1 || c.getCol() < 0 || hasWall(c)) {
             return -1;
         }
-        if (close[c.getRow()][c.getCol()] == 1) {
+        if (close[c.getRow()][c.getCol()]) {
             return 0;
         }
         return 1;
@@ -180,6 +195,10 @@ public class Maze {
 
     /**
      * Generate shortest path depending on the data that set in findShortestPath.
+     * Use a stack to store path from exit to entry.
+     * If trace from entry to exit, then different path will be found, hence increases complexity.
+     * After this trace process is done (reach entry), pop stack content into <code>LinkedList path</code>.
+     * In this way to generate final output path.
      *
      * @param s stack for storing inverse order path
      * @return path from entry to exit
@@ -210,7 +229,7 @@ public class Maze {
     }
 
     /**
-     * Move to input MazeCoord to selected direction.
+     * Return a moved coord on given direction.
      * Sum of opposite direction (i.e, up and down) is 3.
      *
      * @param coord  input MazeCoord
@@ -220,26 +239,27 @@ public class Maze {
      *               3 - move down
      * @return MazeCoord that after movement
      */
-    private MazeCoord moveNext(MazeCoord coord, int orient) {
+    private MazeCoord moveNext(MazeCoord coord, int orient) throws InvalidParameterException {
         int r = coord.getRow();
         int c = coord.getCol();
 
         if (orient == 0) {
-            return new MazeCoord(r - 1, c);
-        } else if (orient == 1) {
-            return new MazeCoord(r, c - 1);
-        } else if (orient == 2) {
-            return new MazeCoord(r, c + 1);
-        } else if (orient == 3) {
-            return new MazeCoord(r + 1, c);
-        } else {
-            System.out.println("Wrong Orientation! " + orient);
-            return coord;
+            return new MazeCoord(r - 1, c);     // move up
         }
+        if (orient == 1) {
+            return new MazeCoord(r, c - 1);     // move left
+        }
+        if (orient == 2) {
+            return new MazeCoord(r, c + 1);     // move right
+        }
+        if (orient == 3) {
+            return new MazeCoord(r + 1, c);     // move down
+        }
+        throw new InvalidParameterException("Invalid Orientation: " + orient + " !");       // error message
     }
 
     /**
-     * Print distance data as debug purpose.
+     * Print distance data for debug purpose.
      */
     private void printData() {
         for (int[] aData : data) {
