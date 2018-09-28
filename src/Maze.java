@@ -132,40 +132,30 @@ public class Maze {
         }
 
         setData(entry, 1);
-        findPath(entry);
-        System.out.println(Arrays.deepToString(data));
-        System.out.println(Arrays.deepToString(close));
+        findShortestPath(entry);
         if (getData(exit) != 0) {
-            traceBackPath(exit);
-            path = new LinkedList<>(pathOutput(pathStack));
+            path = new LinkedList<>(generatePath(pathStack));
             return true;
         }
         return false;
     }
-
 
     /**
      * Find shortest path in maze using Dijkstra algorithm.
      *
      * @param c current coord
      */
-    private void findPath(MazeCoord c) {
+    private void findShortestPath(MazeCoord c) {
         close[c.getRow()][c.getCol()] = 1;
-        System.out.println(c.toString());
         MazeCoord next;
-
         for (int i = 0; i < 4; i++) {
             next = moveNext(c, i);
             if (isAvailable(next) > -1 && (getData(next) == 0 || getData(next) > getData(c) + 1)) {
                 setData(next, getData(c) + 1);
                 close[next.getRow()][next.getCol()] = 0;        // Open this point
-
             }
-        }
-        for (int i = 0; i < 4; i++) {
-            next = moveNext(c, i);
             if (isAvailable(next) > 0) {
-                findPath(next);
+                findShortestPath(next);
             }
         }
     }
@@ -189,56 +179,34 @@ public class Maze {
     }
 
     /**
-     * Pop each element in stack into LinkedList path and return it as final path output.
+     * Generate shortest path depending on the data that set in findShortestPath.
      *
-     * @param s stack that store entire path
-     * @return path LinkedList
+     * @param s stack for storing inverse order path
+     * @return path from entry to exit
      */
-    private LinkedList<MazeCoord> pathOutput(Stack<MazeCoord> s) {
-        LinkedList<MazeCoord> inOrderPath = new LinkedList<>();
-
-        /* Make path in order */
-        while (s.size() != 0) {
-            inOrderPath.add(s.pop());
-        }
-        return inOrderPath;
-    }
-
-    /**
-     * Trace min distance recursively from exit to entry, which is in inverse order.
-     * Hence, use FIFO stack to store when adding.
-     * Pop each MazeCoord in pathOutput to reverse path in order.
-     *
-     * @param pos current MazeCoord
-     */
-    private void traceBackPath(MazeCoord pos) {
-
-        /* Store current position */
-        pathStack.push(pos);
-
-        /* If current position is not entry (path finish point), continue process */
-        if (!pos.equals(entry)) {
-            traceBackPath(findMinNext(pos));
-        }
-    }
-
-    /**
-     * Find min distance in four possible direction based on input MazeCoord.
-     * Have to check the availability of each direction first to avoid wall or out of boundary.
-     *
-     * @param coord input MazeCoord
-     * @return next MazeCoord that has min distance to entry
-     */
-    private MazeCoord findMinNext(MazeCoord coord) {
-        int min = getData(coord);
-        MazeCoord next = coord;
-        for (int i = 0; i < 4; i++) {
-            if (isAvailable(moveNext(coord, i)) > -1 && getData(moveNext(coord, i)) < min) {
-                min = getData(moveNext(coord, i));
-                next = moveNext(coord, i);
+    private LinkedList<MazeCoord> generatePath(Stack<MazeCoord> s) {
+        MazeCoord move;
+        MazeCoord temp = exit;
+        MazeCoord coord = exit;
+        s.push(exit);
+        while (!coord.equals(entry)) {
+            int min = getData(coord);
+            for (int i = 0; i < 4; i++) {
+                move = moveNext(coord, i);
+                if (isAvailable(move) > -1 && getData(move) < min) {
+                    min = getData(move);
+                    temp = move;
+                }
             }
+            coord = temp;
+            s.push(coord);
         }
-        return next;
+
+        /* Reverse order */
+        while (!s.empty()) {
+            path.add(s.pop());
+        }
+        return path;
     }
 
     /**
@@ -253,17 +221,17 @@ public class Maze {
      * @return MazeCoord that after movement
      */
     private MazeCoord moveNext(MazeCoord coord, int orient) {
-        int newCol = coord.getCol();
-        int newRow = coord.getRow();
+        int r = coord.getRow();
+        int c = coord.getCol();
 
         if (orient == 0) {
-            return new MazeCoord(newRow - 1, newCol);
+            return new MazeCoord(r - 1, c);
         } else if (orient == 1) {
-            return new MazeCoord(newRow, newCol - 1);
+            return new MazeCoord(r, c - 1);
         } else if (orient == 2) {
-            return new MazeCoord(newRow, newCol + 1);
+            return new MazeCoord(r, c + 1);
         } else if (orient == 3) {
-            return new MazeCoord(newRow + 1, newCol);
+            return new MazeCoord(r + 1, c);
         } else {
             System.out.println("Wrong Orientation! " + orient);
             return coord;
