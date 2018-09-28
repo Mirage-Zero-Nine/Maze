@@ -4,11 +4,11 @@ import java.util.Stack;
 
 
 /**
- * Maze class.
- * This class defines the method to obtain the info of total rows & columns.
+ * Maze class that defines the method to obtain the info of total rows & columns.
  * Also in this class search shortest method is defined (searchPath).
  * The searchPath method will be called by MazeFrame. If searchPath returns true, then path will be found and draw.
- * * @author BorisMirage
+ *
+ * @author BorisMirage
  * Time: 2018/07/26 20:49
  * Created with IntelliJ IDEA
  */
@@ -16,9 +16,9 @@ public class Maze {
 
     private MazeCoord entry;
     private MazeCoord exit;
-    private int[][] data;
+    private int[][] data;       // int array that store walls and distance
+    private int[][] close;      // whether this point will be revisited in further recursion
     private LinkedList<MazeCoord> path = new LinkedList<>();
-    private int[][] visitTimes;      // Record coord visited times
     private Stack<MazeCoord> pathStack = new Stack<>();
 
     /**
@@ -31,8 +31,8 @@ public class Maze {
     public Maze(int[][] mazeData, MazeCoord startLoc, MazeCoord exitLoc) {
         entry = startLoc;
         exit = exitLoc;
-        data = mazeData;                // int array that store walls and distance
-        visitTimes = new int[data.length][data[0].length];
+        data = mazeData;
+        close = new int[data.length][data[0].length];
     }
 
     /**
@@ -59,7 +59,7 @@ public class Maze {
      * @param loc input location
      * @return true if input location has wall, otherwise return false.
      */
-    public boolean hasWallAt(MazeCoord loc) {
+    public boolean hasWall(MazeCoord loc) {
         return data[loc.getRow()][loc.getCol()] == -1;
     }
 
@@ -94,34 +94,43 @@ public class Maze {
     }
 
     /**
-     * Search path from entry to exit.
-     * Since the min distance was found through exit to entry, path needs to be reversed in pathOutput.
-     * This method can be accessed outside of Maze class.
+     * Get represented value store in mazeData based on input MazeCoord.
      *
-     * @return true if there exist a path from entry to exit, otherwise false
+     * @param coord input MazeCoord
+     * @return represented value store in 2D int array mazeData
      */
+    private int getData(MazeCoord coord) {
+        return data[coord.getRow()][coord.getCol()];
+    }
+
+    /**
+     * Get value store in mazeData based on input MazeCoord.
+     *
+     * @param coord input MazeCoord
+     * @param value value to be set
+     */
+    private void setData(MazeCoord coord, int value) {
+        data[coord.getRow()][coord.getCol()] = value;
+    }
+
     public boolean searchPath() {
 
-        if (hasWallAt(entry) || hasWallAt(exit)) {
+        /* Direct check */
+        if (hasWall(entry) || hasWall(exit)) {
             return false;
         }
 
         /* One-element maze */
-        if (entry.equals(exit) && !hasWallAt(entry)) {
+        if (entry.equals(exit) && !hasWall(entry)) {
             path.add(exit);
             return true;
         }
 
-        /* Set initial data into mazeData */
         setData(entry, 1);
-
-        /* Fill each reachable MazeCoord in maze and put min distance into it */
-        tryNext(entry, -1);
-        System.out.println("DEBUG: Showing maze data. . . ");
-        printData();
-
-        /* Check if exit is visited hence assure if there is a path or not */
-        if (getData(exit) != Integer.MAX_VALUE - 1) {
+        shortNext(entry);
+        System.out.println(Arrays.deepToString(data));
+        System.out.println(Arrays.deepToString(close));
+        if (getData(exit) != 0) {
             traceBackPath(exit);
             path = new LinkedList<>(pathOutput(pathStack));
             return true;
@@ -129,45 +138,38 @@ public class Maze {
         return false;
     }
 
-    /**
-     * Try possible next coord recursively until each coord has been visited 4 times.
-     * This recursion contains orientation in order to avoid duplicate movement.
-     * It will try move direction that is not same as input orientation.
-     * If all 3 different direction is not available, it will finally try last incoming direction.
-     *
-     * @param cur current MazeCoord
-     * @param ori orientation from previous movement.
-     *            i.e, if current MazeCoord came from previous MazeCoord move upward, then the input orientation is 0.
-     *            See moveNext for more orientation int info
-     */
-    private void tryNext(MazeCoord cur, int ori) {
 
-        /* First compare distance in current MazeCoord */
-        greedy(cur);
-
-//        if (visitTimes[exit.getRow()][exit.getRow()] > 3) {
-//            return;
-//        }
+    private void shortNext(MazeCoord c) {
+        close[c.getRow()][c.getCol()] = 1;
+        System.out.println(c.toString());
         MazeCoord next;
-        if (ori == -1) {
-            for (int i = 0; i < 4; i++) {
-                if (checkCoord(moveNext(cur, i)) > 0) {
-                    next = moveNext(cur, i);
-                    addVisit(next);
-                    tryNext(next, i);
-                }
-            }
-        } else {
-            for (int i = 0; i < 4; i++) {
 
-                /* Avoid try incoming direction and check availability */
-                if (3 - ori != i && checkCoord(moveNext(cur, i)) > 0) {
-                    next = moveNext(cur, i);
-                    addVisit(next);
-                    tryNext(next, i);
-                }
+        for (int i = 0; i < 4; i++) {
+            next = moveNext(c, i);
+            if (isAvailable(next) > -1 && (getData(next) == 0 || getData(next) > getData(c) + 1)) {
+                setData(next, getData(c) + 1);
+                close[next.getRow()][next.getCol()] = 0;        // Open this point
+
             }
         }
+        for (int i = 0; i < 4; i++) {
+            next = moveNext(c, i);
+            if (isAvailable(next) > 0) {
+                shortNext(next);
+            }
+        }
+    }
+
+    private int isAvailable(MazeCoord c) {
+
+        /* If can basically move to this point */
+        if (c.getRow() > numRows() - 1 || c.getRow() < 0 || c.getCol() > numCols() - 1 || c.getCol() < 0 || hasWall(c)) {
+            return -1;
+        }
+        if (close[c.getRow()][c.getCol()] == 1) {
+            return 0;
+        }
+        return 1;
     }
 
     /**
@@ -224,47 +226,14 @@ public class Maze {
     }
 
     /**
-     * Greedy method to fill the mazeData array with min distance to entry.
-     *
-     * @param coord input MazeCoord
-     */
-    private void greedy(MazeCoord coord) {
-        for (int i = 0; i < 4; i++) {
-            if (checkCoord(moveNext(coord, i)) > -1) {
-                setMin(coord, moveNext(coord, i));
-            }
-        }
-    }
-
-    /**
-     * Set min distance in two continues coord.
-     * coord1 and coord2
-     *
-     * @param coord1 coord 1
-     * @param coord2 coord 2
-     */
-    private void setMin(MazeCoord coord1, MazeCoord coord2) {
-        int curData = getData(coord1);
-        int nextData = getData(coord2);
-        if (curData + 1 < nextData) {
-            setData(coord2, curData + 1);
-        }
-        if (nextData + 1 < curData) {
-            setData(coord1, nextData + 1);
-        }
-    }
-
-    /**
      * Check if input position can be moved to.
      *
      * @param c input coord
      * @return -1 if out of bound or has wall, 0 if visited more than 3 times, or 1 if available.
      */
     private int checkCoord(MazeCoord c) {
-        if (c.getRow() > numRows() - 1 || c.getRow() < 0 || c.getCol() > numCols() - 1 || c.getCol() < 0 || hasWallAt(c)) {
+        if (c.getRow() > numRows() - 1 || c.getRow() < 0 || c.getCol() > numCols() - 1 || c.getCol() < 0 || hasWall(c)) {
             return -1;      // Out of bound
-        } else if (visitTimes[c.getRow()][c.getCol()] > 4) {
-            return 0;       // Duplicate visit
         } else {
             return 1;       // Available
         }
@@ -297,35 +266,6 @@ public class Maze {
             System.out.println("Wrong Orientation! " + orient);
             return coord;
         }
-    }
-
-    /**
-     * Get represented value store in mazeData based on input MazeCoord.
-     *
-     * @param coord input MazeCoord
-     * @return represented value store in 2D int array mazeData
-     */
-    private int getData(MazeCoord coord) {
-        return data[coord.getRow()][coord.getCol()];
-    }
-
-    /**
-     * Get value store in mazeData based on input MazeCoord.
-     *
-     * @param coord input MazeCoord
-     * @param value value to be set
-     */
-    private void setData(MazeCoord coord, int value) {
-        data[coord.getRow()][coord.getCol()] = value;
-    }
-
-    /**
-     * Add one to represented coord in visitTimes.
-     *
-     * @param coord input coord
-     */
-    private void addVisit(MazeCoord coord) {
-        visitTimes[coord.getRow()][coord.getCol()] += 1;
     }
 
     /**

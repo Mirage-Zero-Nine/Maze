@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.io.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -27,10 +28,13 @@ public class MazeViewer {
         File testFile = new File(fileDirectory);
         LinkedList<String> filePath = new LinkedList<>();
         String[] nameList = testFile.list();
+//        System.out.println(Arrays.toString(nameList));
         if (nameList != null) {
-            for (String aNameList : nameList) {
-                String temp = fileDirectory + "/" + aNameList;
-                filePath.add(temp);
+            for (String fileName : nameList) {
+                if (!fileName.equals(".DS_Store")) {
+                    String temp = fileDirectory + "/" + fileName;
+                    filePath.add(temp);
+                }
             }
         }
 
@@ -66,7 +70,7 @@ public class MazeViewer {
         /* Create a input reader to read data and save to buffer. */
         InputStreamReader newReader = new InputStreamReader(new FileInputStream(readMazeFile));
         BufferedReader newBufferRead = new BufferedReader(newReader);
-
+//        System.out.println(fileName);
         /* Read first line about new maze, convert to integer. */
         String[] para = newBufferRead.readLine().split(" ");
 
@@ -83,7 +87,7 @@ public class MazeViewer {
                 if (current == WALL_CHAR) {
                     readMazeData[i][j] = -1;
                 } else if (current == FREE_CHAR) {
-                    readMazeData[i][j] = Integer.MAX_VALUE - 1;
+                    readMazeData[i][j] = 0;
                 }
             }
         }

@@ -89,7 +89,7 @@ public class MazeComponent extends JComponent {
             for (int j = 0; j < maze.numCols(); j++) {
                 int currentX = START_Y + j * BOX_WIDTH;
                 int currentY = START_X + i * BOX_HEIGHT;
-                if (maze.hasWallAt(new MazeCoord(i, j))) {
+                if (maze.hasWall(new MazeCoord(i, j))) {
                     Rectangle mazeWall = new Rectangle(currentX, currentY, BOX_WIDTH, BOX_HEIGHT);
                     g2.setColor(Color.DARK_GRAY);
                     g2.draw(mazeWall);
