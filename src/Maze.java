@@ -113,6 +113,11 @@ public class Maze {
         data[coord.getRow()][coord.getCol()] = value;
     }
 
+    /**
+     * Called by outside of class to initialize the finding process.
+     *
+     * @return if there is a shortest path
+     */
     public boolean searchPath() {
 
         /* Direct check */
@@ -127,7 +132,7 @@ public class Maze {
         }
 
         setData(entry, 1);
-        shortNext(entry);
+        findPath(entry);
         System.out.println(Arrays.deepToString(data));
         System.out.println(Arrays.deepToString(close));
         if (getData(exit) != 0) {
@@ -139,7 +144,12 @@ public class Maze {
     }
 
 
-    private void shortNext(MazeCoord c) {
+    /**
+     * Find shortest path in maze using Dijkstra algorithm.
+     *
+     * @param c current coord
+     */
+    private void findPath(MazeCoord c) {
         close[c.getRow()][c.getCol()] = 1;
         System.out.println(c.toString());
         MazeCoord next;
@@ -155,11 +165,17 @@ public class Maze {
         for (int i = 0; i < 4; i++) {
             next = moveNext(c, i);
             if (isAvailable(next) > 0) {
-                shortNext(next);
+                findPath(next);
             }
         }
     }
 
+    /**
+     * Check given MazeCoord is available to be moved or not.
+     *
+     * @param c MazeCoord
+     * @return if this coord can be moved to or not
+     */
     private int isAvailable(MazeCoord c) {
 
         /* If can basically move to this point */
@@ -217,26 +233,12 @@ public class Maze {
         int min = getData(coord);
         MazeCoord next = coord;
         for (int i = 0; i < 4; i++) {
-            if (checkCoord(moveNext(coord, i)) > -1 && getData(moveNext(coord, i)) < min) {
+            if (isAvailable(moveNext(coord, i)) > -1 && getData(moveNext(coord, i)) < min) {
                 min = getData(moveNext(coord, i));
                 next = moveNext(coord, i);
             }
         }
         return next;
-    }
-
-    /**
-     * Check if input position can be moved to.
-     *
-     * @param c input coord
-     * @return -1 if out of bound or has wall, 0 if visited more than 3 times, or 1 if available.
-     */
-    private int checkCoord(MazeCoord c) {
-        if (c.getRow() > numRows() - 1 || c.getRow() < 0 || c.getCol() > numCols() - 1 || c.getCol() < 0 || hasWall(c)) {
-            return -1;      // Out of bound
-        } else {
-            return 1;       // Available
-        }
     }
 
     /**
