@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * Created with IntelliJ IDEA
  */
 
-public class MazeViewer {
+public class StartMaze {
 
     private static final char WALL_CHAR = '1';
     private static final char FREE_CHAR = '0';
