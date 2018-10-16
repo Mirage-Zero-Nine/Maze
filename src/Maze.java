@@ -238,6 +238,7 @@ public class Maze {
      *               2 - move right
      *               3 - move down
      * @return MazeCoord that after movement
+     * @throws InvalidParameterException orientation is invalid
      */
     private MazeCoord moveCoord(MazeCoord coord, int orient) throws InvalidParameterException {
         int r = coord.getRow();
