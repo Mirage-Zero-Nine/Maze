@@ -161,7 +161,7 @@ public class Maze {
         close[c.getRow()][c.getCol()] = true;
         MazeCoord next;
         for (int i = 0; i < 4; i++) {
-            next = moveCoord(c, i);
+            next = c.move(i);
             if (isAvailable(next) > -1 && (getData(next) == 0 || getData(next) > getData(c) + 1)) {
                 setData(next, getData(c) + 1);
                 close[next.getRow()][next.getCol()] = false;        // Open this point
@@ -211,7 +211,7 @@ public class Maze {
         while (!coord.equals(entry)) {
             int min = getData(coord);
             for (int i = 0; i < 4; i++) {
-                move = moveCoord(coord, i);
+                move = coord.move(i);
                 if (isAvailable(move) > -1 && getData(move) < min) {
                     min = getData(move);
                     temp = move;
@@ -226,40 +226,6 @@ public class Maze {
             path.add(s.pop());
         }
         return path;
-    }
-
-    /**
-     * Return a moved coord on given direction.
-     * Sum of opposite direction (i.e, up and down) is 3.
-     *
-     * @param coord  input MazeCoord
-     * @param orient 0 - move upward
-     *               1 - move left
-     *               2 - move right
-     *               3 - move down
-     * @return MazeCoord that after movement
-     * @throws InvalidParameterException orientation is invalid
-     */
-    private MazeCoord moveCoord(MazeCoord coord, int orient) throws InvalidParameterException {
-        int r = coord.getRow();
-        int c = coord.getCol();
-
-        switch (orient) {
-            case 0:
-                return new MazeCoord(r - 1, c);     // move up
-
-            case 1:
-                return new MazeCoord(r, c - 1);     // move left
-
-            case 2:
-                return new MazeCoord(r, c + 1);     // move right
-
-            case 3:
-                return new MazeCoord(r + 1, c);     // move down
-
-            default:
-                throw new InvalidParameterException("Invalid Orientation: " + orient + " !");       // error message
-        }
     }
 
     /**
