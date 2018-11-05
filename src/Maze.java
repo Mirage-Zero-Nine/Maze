@@ -244,19 +244,22 @@ public class Maze {
         int r = coord.getRow();
         int c = coord.getCol();
 
-        if (orient == 0) {
-            return new MazeCoord(r - 1, c);     // move up
+        switch (orient) {
+            case 0:
+                return new MazeCoord(r - 1, c);     // move up
+
+            case 1:
+                return new MazeCoord(r, c - 1);     // move left
+
+            case 2:
+                return new MazeCoord(r, c + 1);     // move right
+
+            case 3:
+                return new MazeCoord(r + 1, c);     // move down
+
+            default:
+                throw new InvalidParameterException("Invalid Orientation: " + orient + " !");       // error message
         }
-        if (orient == 1) {
-            return new MazeCoord(r, c - 1);     // move left
-        }
-        if (orient == 2) {
-            return new MazeCoord(r, c + 1);     // move right
-        }
-        if (orient == 3) {
-            return new MazeCoord(r + 1, c);     // move down
-        }
-        throw new InvalidParameterException("Invalid Orientation: " + orient + " !");       // error message
     }
 
     /**

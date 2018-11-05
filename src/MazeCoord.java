@@ -1,3 +1,5 @@
+import java.security.InvalidParameterException;
+
 /**
  * This class define some maze property.
  *
@@ -68,6 +70,39 @@ public class MazeCoord {
      */
     public String toString() {
         return "MazeCoord[row=" + row + ",col=" + col + "]";
+    }
+
+    /**
+     * Return a moved coord on given direction.
+     * Sum of opposite direction (i.e, up and down) is 3.
+     *
+     * @param orientation 0 - move upward
+     *                    1 - move left
+     *                    2 - move right
+     *                    3 - move down
+     * @return move MazeCoord
+     * @throws InvalidParameterException orientation is invalid
+     */
+    public MazeCoord move(int orientation) {
+        int r = this.row;
+        int c = this.col;
+
+        switch (orientation) {
+            case 0:
+                return new MazeCoord(r - 1, c);     // move up
+
+            case 1:
+                return new MazeCoord(r, c - 1);     // move left
+
+            case 2:
+                return new MazeCoord(r, c + 1);     // move right
+
+            case 3:
+                return new MazeCoord(r + 1, c);     // move down
+
+            default:
+                throw new InvalidParameterException("Invalid Orientation: " + orientation + " !");       // error message
+        }
     }
 
 }
